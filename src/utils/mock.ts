@@ -10,16 +10,23 @@ export class UtilService {
   private readonly logger = new Logger(UtilService.name);
 
   generateRandomString(length: number): string {
-    return Math.random().toString(36).substring(2, 2 + length);
+    if (length < 0) {
+      throw new Error('Length must be a non-negative integer');
+    }
+    const crypto = require('crypto');
+    return crypto
+      .randomBytes(Math.ceil(length * 0.75))
+      .toString('base64')
+      .slice(0, length);
   }
 
   processDataAndLog(data: string[]): string[] {
     this.logger.debug('Processing data: ', data);
     const processedData = data.map((item: string) => {
       if (typeof item === 'string') {
-        item.toUpperCase();
+        return item.toUpperCase();
       } else {
-        'Not supported type';
+        return 'Not supported type';
       }
     });
     this.logger.debug('Processed Data: ', processedData);
@@ -68,6 +75,9 @@ export class UtilService {
 
   async fetchDataFromAPI(url: string): Promise<{status: string, data: unknown}> {
     try {
+      if (!url || !url.trim()) {
+        throw new Error('Url cannot be empty');
+      }
       const response = await Promise.resolve({ status: 'OK', data: 'Some Data' });
       return response;
     } catch (error) {
@@ -77,16 +87,21 @@ export class UtilService {
   }
 
   processUserData(userData: UserData) {
-    if (typeof userData.name !== 'string') {
+    if (!userData) {
       throw new Error('User data cannot be null');
+    }
+    if (typeof userData.name !== 'string') {
+      throw new Error('User name must be a string');
     }
     this.logger.debug('Processing user data...');
     return userData.name.toUpperCase();
   }
 
-  // Clean code method to filter invalid data
-  filterValidData(data: any[]): any[] {
-    return data.filter(item => item != null && item !== '');
+  filterValidData<T>(data: (T | null | undefined)[]): T[] {
+    return data.filter((item): item is T => 
+      item !== null &&
+      item !== undefined &&
+      (typeof item === 'string') ? item !== '' : true)
   }
 
   calculateDiscountPrice(price: number, discount: number): number {
