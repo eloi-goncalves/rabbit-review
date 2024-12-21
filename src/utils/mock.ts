@@ -1,4 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
+interface UserData {
+  name: string;
+  [key: string]: unknown;
+}
 
 @Injectable()
 export class UtilService {
@@ -9,10 +13,16 @@ export class UtilService {
     return Math.random().toString(36).substring(2, 2 + length);
   }
 
-  processDataAndLog(data: any) {
-    console.log('Processing data: ', data);
-    const processedData = data.map((item: string) => item.toUpperCase());
-    console.log('Processed Data: ', processedData);
+  processDataAndLog(data: string[]): string[] {
+    this.logger.debug('Processing data: ', data);
+    const processedData = data.map((item: string) => {
+      if (typeof item === 'string') {
+        item.toUpperCase();
+      } else {
+        'Not supported type';
+      }
+    });
+    this.logger.debug('Processed Data: ', processedData);
     return processedData;
   }
 
@@ -40,7 +50,7 @@ export class UtilService {
     if (!date) {
       throw new Error('Date cannot be null or undefined');
     }
-    if (!(date instanceof Date) || isNaN(date.getTime())) {
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
       throw new Error('Invalid date object');
     }
     return date.toISOString();
@@ -66,11 +76,11 @@ export class UtilService {
     }
   }
 
-  processUserData(userData: any) {
-    if (userData == null) {
+  processUserData(userData: UserData) {
+    if (typeof userData.name !== 'string') {
       throw new Error('User data cannot be null');
     }
-    console.log('Processing user data...');
+    this.logger.debug('Processing user data...');
     return userData.name.toUpperCase();
   }
 
