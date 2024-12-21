@@ -22,7 +22,13 @@ export class UtilService {
     return result;
   }
 
-  formatDate(date: Date): string {
+  formatDate(date: Date | null | undefined): string {
+    if (!date) {
+      throw new Error('Date cannot be null or undefined');
+    }
+    if (!(date instanceof Date) || isNaN(date.getTime())) {
+      throw new Error('Invalid date object');
+    }
     return date.toISOString();
   }
 
