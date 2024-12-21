@@ -27,8 +27,8 @@ export class UtilService {
   }
 
   saveToDatabase(data: any) {
-    const db = {};  // mock db object
-    db['data'] = data; // Direct mutation of a global object is not ideal
+    const db = {};
+    db['data'] = data;
     console.log('Data saved to DB:', data);
     return true;
   }
@@ -40,12 +40,10 @@ export class UtilService {
     }, 1000);
   }
 
-  // Problematic method 5: No proper error handling and logging
   processUserData(userData: any) {
     if (userData == null) {
       throw new Error('User data cannot be null');
     }
-    // Simulating some processing with potential errors and no proper logging
     console.log('Processing user data...');
     return userData.name.toUpperCase();
   }
@@ -55,7 +53,6 @@ export class UtilService {
     return data.filter(item => item != null && item !== '');
   }
 
-  // Problematic method 6: No DRY principle, repeated code
   calculateDiscountPrice(price: number, discount: number): number {
     return price - (price * discount);
   }
