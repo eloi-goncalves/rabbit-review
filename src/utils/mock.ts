@@ -15,8 +15,8 @@ export class UtilService {
     }
 
     return crypto
-      .randomBytes(Math.ceil(length * 0.75))
-      .toString('base64')
+      .randomBytes(length)
+      .toString('hex')
       .slice(0, length);
   }
 

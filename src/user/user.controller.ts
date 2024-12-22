@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  InternalServerErrorException,
   NotFoundException,
   Param,
   Post,
@@ -32,11 +33,18 @@ export class UserController {
       throw new BadRequestException('Invalid ID');
     }
 
-    const user = await this.repository.findOne(userID);
+    try {
+      const user = await this.repository.findOne(userID);
 
-    if (!user) {
-      throw new NotFoundException(`User with ID ${userID} not found`);
+      if (!user) {
+        throw new NotFoundException(`User with ID ${userID} not found`);
+      }
+      return user;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(`Failed to retrieve user`);
     }
-    return user;
   }
 }
