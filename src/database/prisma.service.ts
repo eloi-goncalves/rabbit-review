@@ -14,15 +14,31 @@ export class PrismaService extends PrismaClient implements OnModuleDestroy, OnMo
       this.logger.error(`Error $disconnect ${error}`);
       throw error;
     }
-    
   } 
 
   async onModuleInit() {
-    try {
-      await this.$connect();
-    } catch (error) {
-      this.logger.error(`Error $connect ${error}`);
-      throw error;
+    const maxRetries = 3;
+    let retries = 0;
+
+    while (retries < maxRetries) {
+      try {
+        await this.$connect();
+        return;
+      } catch (error) {
+        retries++;
+        this.logger.error('Failed to connect to the database.', {
+          error: error.message,
+          stack: error.stack,
+          attempt: retries + 1,
+          maxRetries
+        });
+        retries++;
+
+        if (retries === maxRetries) {
+          throw error;
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000 * retries));
+      }
     }
   }
 }

@@ -6,12 +6,16 @@ import User from './user.entity';
 export class UserRepository {
   constructor(private readonly service: PrismaService) {}
 
-  async findMany() {
-    return this.service.user.findMany();
+  async findMany(page = 1, limit = 10) {
+    return this.service.user.findMany({
+      where: { active: true },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
   }
 
   async findOne(id: number) {
-    const user = this.service.user.findUnique({
+    const user = await this.service.user.findUnique({
       where: { id },
     });
 
@@ -26,6 +30,12 @@ export class UserRepository {
   }
 
   async update(user: User) {
+    const exists = await this.findOne(user.id);
+
+    if (!exists) {
+      throw new NotFoundException(`User with ID ${user.id} not found`);
+    }
+
     return this.service.user.update({
       where: { id: user.id },
       data: user as any,
