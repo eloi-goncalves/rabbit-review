@@ -64,10 +64,6 @@ prisma/migrations/
 # Ignore Prisma generated client
 node_modules/@prisma/client/
 
+# Ignore Next.js build output
 package-lock.json
 
-# Ignore .env files
-.env
-
-# Logs
-*.log
