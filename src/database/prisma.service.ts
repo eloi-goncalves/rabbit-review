@@ -1,12 +1,20 @@
-import { Global, Injectable, OnModuleDestroy, OnModuleInit, Logger } from '@nestjs/common';
+import {
+  Global,
+  Injectable,
+  OnModuleDestroy,
+  OnModuleInit,
+  Logger,
+} from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
 @Global()
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleDestroy, OnModuleInit {
-
+export class PrismaService
+  extends PrismaClient
+  implements OnModuleDestroy, OnModuleInit
+{
   private readonly logger = new Logger(PrismaService.name);
-  
+
   async onModuleDestroy() {
     try {
       await this.$disconnect();
@@ -14,7 +22,7 @@ export class PrismaService extends PrismaClient implements OnModuleDestroy, OnMo
       this.logger.error(`Error $disconnect ${error}`);
       throw error;
     }
-  } 
+  }
 
   async onModuleInit() {
     const maxRetries = 3;
@@ -25,19 +33,18 @@ export class PrismaService extends PrismaClient implements OnModuleDestroy, OnMo
         await this.$connect();
         return;
       } catch (error) {
-        retries++;
         this.logger.error('Failed to connect to the database.', {
           error: error.message,
           stack: error.stack,
           attempt: retries + 1,
-          maxRetries
+          maxRetries,
         });
         retries++;
 
         if (retries === maxRetries) {
           throw error;
         }
-        await new Promise(resolve => setTimeout(resolve, 1000 * retries));
+        await new Promise((resolve) => setTimeout(resolve, 1000 * retries));
       }
     }
   }

@@ -21,9 +21,9 @@ export class UserRepository {
 
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
-    } 
+    }
     return user;
-  } 
+  }
 
   async create(user: User) {
     return this.service.user.create({ data: user as any });
@@ -45,10 +45,10 @@ export class UserRepository {
   async delete(id: number) {
     const exists = await this.findOne(id);
 
-    if (!exists) {  
+    if (!exists) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
-    
+
     return this.service.user.delete({
       where: { id },
     });

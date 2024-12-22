@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import * as crypto from 'crypto';
 interface UserData {
   name: string;
   [key: string]: unknown;
@@ -6,14 +7,13 @@ interface UserData {
 
 @Injectable()
 export class UtilService {
-
   private readonly logger = new Logger(UtilService.name);
 
   generateRandomString(length: number): string {
     if (length < 0) {
       throw new Error('Length must be a non-negative integer');
     }
-    const crypto = require('crypto');
+
     return crypto
       .randomBytes(Math.ceil(length * 0.75))
       .toString('base64')
@@ -73,12 +73,17 @@ export class UtilService {
     }
   }
 
-  async fetchDataFromAPI(url: string): Promise<{status: string, data: unknown}> {
+  async fetchDataFromAPI(
+    url: string,
+  ): Promise<{ status: string; data: unknown }> {
     try {
       if (!url || !url.trim()) {
         throw new Error('Url cannot be empty');
       }
-      const response = await Promise.resolve({ status: 'OK', data: 'Some Data' });
+      const response = await Promise.resolve({
+        status: 'OK',
+        data: 'Some Data',
+      });
       return response;
     } catch (error) {
       this.logger.error('API call failed', { error, url });
@@ -98,10 +103,11 @@ export class UtilService {
   }
 
   filterValidData<T>(data: (T | null | undefined)[]): T[] {
-    return data.filter((item): item is T => 
-      item !== null &&
-      item !== undefined &&
-      (typeof item === 'string') ? item !== '' : true)
+    return data.filter((item): item is T =>
+      item !== null && item !== undefined && typeof item === 'string'
+        ? item !== ''
+        : true,
+    );
   }
 
   calculateDiscountPrice(price: number, discount: number): number {
@@ -115,7 +121,6 @@ export class UtilService {
   }
 
   calculateFinalPrice(price: number, tax: number, discount: number): number {
-    
     if (tax < 0) {
       return 0;
     }

@@ -1,12 +1,19 @@
-import { BadRequestException, Body, Controller, Get, NotFoundException, Param, Post } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+} from '@nestjs/common';
 import User from './user.entity';
 import { UserRepository } from './user.repository';
 
 @Controller('users')
 export class UserController {
-
   constructor(private readonly repository: UserRepository) {}
-  
+
   @Get()
   async findAll(): Promise<User[]> {
     return this.repository.findMany();
@@ -21,7 +28,7 @@ export class UserController {
   async findOne(@Param('id') id: string): Promise<User> {
     const userID = Number.parseInt(id);
 
-    if (isNaN(userID)) {
+    if (Number.isNaN(userID)) {
       throw new BadRequestException('Invalid ID');
     }
 
