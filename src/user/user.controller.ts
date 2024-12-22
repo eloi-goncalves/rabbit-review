@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, NotFoundException, Param, Post } from '@nestjs/common';
 import User from './user.entity';
 import { UserRepository } from './user.repository';
 
@@ -22,8 +22,14 @@ export class UserController {
     const userID = Number.parseInt(id);
 
     if (isNaN(userID)) {
-      throw new Error('Invalid ID');
+      throw new BadRequestException('Invalid ID');
     }
-    return this.repository.findOne(userID);
+
+    const user = await this.repository.findOne(userID);
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userID} not found`);
+    }
+    return user;
   }
 }
